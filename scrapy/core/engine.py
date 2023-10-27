@@ -170,6 +170,14 @@ class ExecutionEngine:
         if self.paused:
             return None
 
+        threshold = 100 * int(self.spider.settings["CONCURRENT_REQUESTS"])
+        while (
+            len(self.slot.scheduler) > threshold
+            and not self.downloader.needs_backout()
+            and self._next_request_from_scheduler() is not None
+        ):
+            pass
+                              
         while (
             not self._needs_backout()
             and self._next_request_from_scheduler() is not None
